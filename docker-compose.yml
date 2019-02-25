@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  simpli.seo.web:
+    image: ${DOCKER_REGISTRY}simpliseoweb
+    build:
+      context: .
+      dockerfile: Simpli.SEO.Web/Dockerfile

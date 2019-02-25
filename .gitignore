@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+\.vscode/
+
+Simpli\.SEO\.Web/ClientApp/package-lock\.json
