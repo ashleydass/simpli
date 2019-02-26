@@ -17,11 +17,17 @@
 			var matches = htmlDoc
 				.DocumentNode
 				.SelectNodes(ResultXPathExpression)
-				.Select((n, i) => i);
+				.Select((n, i) => new
+				{
+					Rank = i + 1,
+					Url = n.Attributes["href"]?.Value
+				})
+				.Where(r => r.Url.Contains(requestModel.UrlInSearchResults) && r.Rank <= 100)
+				.Select(r => r.Rank);
 
 			return new SearchResult
 			{
-				Matches = matches
+				Matches = matches.ToList()
 			};
 		}
 

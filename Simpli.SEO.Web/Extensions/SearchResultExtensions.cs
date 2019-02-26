@@ -7,7 +7,10 @@
 	{
 		public static SearchResultDto AsDto(this SearchResult searchResult)
 		{
-			return new SearchResultDto();
+			return new SearchResultDto
+			{
+				Matches = searchResult.Matches
+			};
 		}
 	}
 }

@@ -5,6 +5,8 @@
 		public SearchEngineEnum SearchEngine { get; set; }
 
 		public string Query { get; set; }
+
+		public string UrlInSearchResults { get; set; }
 	}
 
 	public enum SearchEngineEnum

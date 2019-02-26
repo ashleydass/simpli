@@ -19,11 +19,16 @@
 		}
 
 		[HttpGet("")]
-		public async Task<SearchResultDto> Get([FromQuery]SearchResultModel requestModel)
+		public async Task<ActionResult<SearchResultDto>> GetAsync([FromQuery]SearchResultModel requestModel)
 		{
 			var searchService = _searchServiceFactory.GetSearchService(requestModel.SearchEngine);
 
 			var result = await searchService.PerformSearchAsync(requestModel);
+
+			if (!result.HasResults)
+			{
+				return NotFound();
+			}
 
 			return result.AsDto();
 		}
