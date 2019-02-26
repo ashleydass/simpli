@@ -1,5 +1,6 @@
 ﻿namespace Simpli.SEO.Web.Extensions
 {
+	using System.Linq;
 	using Dtos;
 	using Models;
 
@@ -9,7 +10,9 @@
 		{
 			return new SearchResultDto
 			{
-				Matches = searchResult.Matches
+				Matches = searchResult.SearchResultItems
+					.Select(i => i.Rank)
+					.ToList()
 			};
 		}
 	}

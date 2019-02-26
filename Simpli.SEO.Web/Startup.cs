@@ -23,7 +23,7 @@ namespace Simpli.SEO.Web
 		{
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-			services.AddServices();
+			services.AddServices(Configuration);
 
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>

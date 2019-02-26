@@ -1,8 +1,9 @@
 ﻿namespace Simpli.SEO.Web.Controllers
 {
+	using System.Linq;
 	using System.Threading.Tasks;
 	using Dtos;
-	using Extensions;
+	using Microsoft.AspNetCore.Http;
 	using Microsoft.AspNetCore.Mvc;
 	using Models;
 	using Services;
@@ -11,28 +12,40 @@
     [ApiController]
     public class SearchController : ControllerBase
 	{
-		private readonly ISearchServiceFactory _searchServiceFactory;
+		private readonly ISearchService _searchService;
 
-		public SearchController(ISearchServiceFactory searchServiceFactory)
+		public SearchController(ISearchService searchService)
 		{
-			_searchServiceFactory = searchServiceFactory;
+			_searchService = searchService;
 		}
 
 		[HttpGet("")]
-		public async Task<ActionResult<SearchResultDto>> GetAsync([FromQuery]SearchResultModel requestModel)
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchResultDto))]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status501NotImplemented)]
+		public async Task<ActionResult<SearchResultDto>> GetAsync([FromQuery]SearchRequestModel requestModel)
 		{
-			var searchService = _searchServiceFactory.GetSearchService(requestModel.SearchEngine);
+			var result = await _searchService.PerformSearchAsync(requestModel);
 
-			var result = await searchService.PerformSearchAsync(requestModel);
-
-			if (!result.HasResults)
+			if (result.Success)
 			{
-				return NotFound();
+				return new SearchResultDto
+				{
+					Matches = result.SearchResultItems.Select(i => i.Rank).ToList()
+				};
 			}
 
-			return result.AsDto();
+			switch (result.Reason)
+			{
+				case FailureReason.NotSupported:
+					return new StatusCodeResult(501);
+				case FailureReason.NoResults:
+					return NotFound();
+				default:
+					return new StatusCodeResult(500);
+			}
 		}
 	}
 
-	
+
 }

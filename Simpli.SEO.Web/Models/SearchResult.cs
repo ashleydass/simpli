@@ -1,12 +1,13 @@
 ﻿namespace Simpli.SEO.Web.Models
 {
 	using System.Collections.Generic;
-	using Microsoft.EntityFrameworkCore.Internal;
 
 	public class SearchResult
 	{
-		public List<int> Matches { get; set; }
+		public bool Success { get; set; } = true;
 
-		public bool HasResults => Matches.Any();
+		public FailureReason Reason { get; set; }
+
+		public List<SearchResultItem> SearchResultItems { get; set; }
 	}
 }

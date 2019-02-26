@@ -1,15 +1,17 @@
 ﻿namespace Simpli.SEO.Web.Services
 {
+	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
+	using Models;
 
 	public static class Configuration
 	{
-		public static IServiceCollection AddServices(this IServiceCollection services)
+		public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
 		{
 			return services
-				.AddTransient<ISearchServiceFactory, SearchServiceFactory>()
-				.AddTransient<ISearchEngineService, GoogleSearchEngineService>()
-				.AddTransient<ISearchEngineService, BingSearchEngineService>();
+				.Configure<AppOptions>(configuration)
+				.AddTransient<ISearchService, SearchService>()
+				.AddTransient<ISearchExecutor, SearchExecutor>();
 		}
 	}
 }
