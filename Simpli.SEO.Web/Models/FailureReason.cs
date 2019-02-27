@@ -2,7 +2,6 @@
 {
 	public enum FailureReason
 	{
-		NotSupported,
-		NoResults
+		NotSupported
 	}
 }

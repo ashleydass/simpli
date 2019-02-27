@@ -46,8 +46,6 @@
 				{
 					case FailureReason.NotSupported:
 						return new StatusCodeResult(501);
-					case FailureReason.NoResults:
-						return NotFound();
 					default:
 						return new StatusCodeResult(500);
 				}

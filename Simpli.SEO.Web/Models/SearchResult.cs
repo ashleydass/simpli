@@ -1,5 +1,6 @@
 ﻿namespace Simpli.SEO.Web.Models
 {
+	using System;
 	using System.Collections.Generic;
 
 	public class SearchResult

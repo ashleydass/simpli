@@ -43,15 +43,6 @@
 				.Where(i => i.Attributes["href"].Contains(searchModel.UrlPartMatch))
 				.ToList();
 
-			if (!matchingItems.Any())
-			{
-				return new SearchResult
-				{
-					Success = false,
-					Reason = FailureReason.NoResults
-				};
-			}
-
 			return new SearchResult
 			{
 				SearchResultItems = matchingItems
