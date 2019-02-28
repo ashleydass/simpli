@@ -1,8 +1,16 @@
 const ACTION_TYPE_REQUEST_SEO = 'REQUEST_SEO';
 const ACTION_TYPE_RECEIVED_SEO = 'RECEIVED_SEO';
+const ACTION_TYPE_RECEIVED_SEARCH_SOURCES = 'RECEIVED_SEARCH_SOURCES'
 const initialState = {
-  results: [],
+  searchSources: [],
+  results: {},
   isProcessing: false
+}
+
+const fetchSearchSources = async () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(['google', 'bing']), 1000)
+  })
 }
 
 export const actionCreators = {
@@ -11,21 +19,50 @@ export const actionCreators = {
       type: ACTION_TYPE_REQUEST_SEO
     })
 
-    const { searchSource, query, searchFor } = request
-    const url = `api/search?searchSource=${searchSource}&query=${query}&urlPartMatch=${searchFor}`
-    const response = await fetch(url)
-    const result = await response.json()
+    let { searchSources } = getState().seo
 
-    dispatch({
-      type: ACTION_TYPE_RECEIVED_SEO,
-      result,
-      request
+    if (!searchSources || !searchSources.length) {
+      searchSources = await fetchSearchSources()
+
+      dispatch({
+        type: ACTION_TYPE_RECEIVED_SEARCH_SOURCES,
+        searchSources
+      })
+    }
+
+    const { query, searchFor } = request
+    const promises = []
+
+    searchSources.forEach(searchSource => {
+      const url = `api/search?searchSource=${searchSource}&query=${query}&urlPartMatch=${searchFor}`
+      promises.push(
+        fetch(url)
+          .then(r => r.json())
+          .then(j => {
+            dispatch({
+              type: ACTION_TYPE_RECEIVED_SEO,
+              searchSource,
+              result: {
+                ...j,
+                ...request
+              }
+            })
+          }))
     })
+
+    await Promise.all(promises)
   }
 }
 
 export const reducer = (state, action) => {
   state = state || initialState
+
+  if (action.type === ACTION_TYPE_RECEIVED_SEARCH_SOURCES) {
+    return {
+      ...state,
+      searchSources: action.searchSources
+    }
+  }
 
   if (action.type === ACTION_TYPE_REQUEST_SEO) {
     return {
@@ -35,14 +72,16 @@ export const reducer = (state, action) => {
   }
 
   if (action.type === ACTION_TYPE_RECEIVED_SEO) {
-    action.result = {
-      ...action.result,
-      request: action.request
-    }
+    const searchSourceResults = state.results[action.searchSource]
+      ? [action.result, ...state.results[action.searchSource]]
+      : [action.result]
 
     return {
       ...state,
-      results: [action.result, ...state.results],
+      results: {
+        ...state.results,
+        [action.searchSource]: searchSourceResults
+      },
       isProcessing: false
     }
   }

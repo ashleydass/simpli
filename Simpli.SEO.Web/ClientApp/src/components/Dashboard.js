@@ -9,9 +9,9 @@ class Dashboard extends Component {
     super(props)
 
     this.state = {
-      searchSource: 'google',
       query: '',
-      searchFor: ''
+      searchFor: '',
+      active: 'bing'
     }
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -34,16 +34,23 @@ class Dashboard extends Component {
 
   getResultRows() {
     const { results } = this.props
-    const total = results.length
-    return results.map((m, i) => {
-      const { matches, timestamp, request } = m
-      const { searchSource, query, searchFor } = request
+    const { active } = this.state
+    const matchResults = results[active]
+
+    if (!matchResults) {
+      return null
+    }
+
+    const total = matchResults.length
+
+    return matchResults.map((m, i) => {
+      const { matches, timestamp, query, searchFor } = m
       const time = new Date(timestamp)
       return (
         <tr key={i}>
           <th scope="row">{total - i}</th>
           <td>{time.getUTCFullYear() +"/"+ (time.getUTCMonth()+1) +"/"+ time.getUTCDate() + " " + time.getUTCHours() + ":" + time.getUTCMinutes() + ":" + time.getUTCSeconds()}</td>
-          <td>{searchSource}</td>
+          <td>{active}</td>
           <td>{query}</td>
           <td>{searchFor}</td>
           <td>{matches.join(',')}</td>
