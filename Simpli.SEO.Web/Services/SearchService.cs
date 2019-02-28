@@ -1,5 +1,6 @@
 ﻿namespace Simpli.SEO.Web.Services
 {
+	using System.Collections.Generic;
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Microsoft.Extensions.Options;
@@ -15,6 +16,11 @@
 		{
 			_searchExecutor = searchExecutor;
 			_appOptions = appOptions.Value;
+		}
+
+		public List<string> GetAvailableSearchSources()
+		{
+			return _appOptions.SearchSources.Select(ss => ss.Source).ToList();
 		}
 
 		public async Task<SearchResult> PerformSearchAsync(SearchRequestModel searchModel)

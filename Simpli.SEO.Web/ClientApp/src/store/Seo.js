@@ -8,9 +8,11 @@ const initialState = {
 }
 
 const fetchSearchSources = async () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => resolve(['google', 'bing']), 1000)
-  })
+  const url = 'api/search/sources'
+  const response = await fetch(url)
+  const json = await response.json()
+
+  return json.sources
 }
 
 export const actionCreators = {
@@ -21,6 +23,8 @@ export const actionCreators = {
       type: ACTION_TYPE_RECEIVED_SEARCH_SOURCES,
       searchSources
     })
+
+    return searchSources
   },
   requestSeo: request => async (dispatch, getState) => {
     dispatch({
@@ -30,12 +34,7 @@ export const actionCreators = {
     let { searchSources } = getState().seo
 
     if (!searchSources || !searchSources.length) {
-      searchSources = await fetchSearchSources()
-
-      dispatch({
-        type: ACTION_TYPE_RECEIVED_SEARCH_SOURCES,
-        searchSources
-      })
+      this.requestSearchSources()
     }
 
     const { query, searchFor } = request

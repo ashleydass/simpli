@@ -137,6 +137,7 @@ class Dashboard extends Component {
 
   getForm() {
     const { loop } = this.state
+    const { isProcessing } = this.props
     return (
       <form>
         <div className="form-group">
@@ -149,12 +150,9 @@ class Dashboard extends Component {
           <input type="text" className="form-control" id="searchFor" placeholder="Url Part"
                 onChange={this.handleChange} />
         </div>
-        {/* <div className="form-check">
-          <input type="checkbox" className="form-check-input" id="useCache" />
-          <label className="form-check-label" htmlFor="useCache">Use Caching</label>
-        </div> */}
         <button type="submit" className="btn btn-primary"
                 onClick={this.handleSubmit}>{loop?"Pause":"Start"}</button>
+        <i>{isProcessing ? 'Fetching data...' : null}</i>
       </form>)
   }
 

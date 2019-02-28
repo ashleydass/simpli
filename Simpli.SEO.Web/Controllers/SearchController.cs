@@ -23,13 +23,33 @@
 			_logger = logger;
 		}
 
+		[HttpGet("sources")]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchSourceDto))]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		public ActionResult<SearchSourceDto> GetSearchSourcesAsync()
+		{
+			try
+			{
+				var result = _searchService.GetAvailableSearchSources();
+
+				return new SearchSourceDto
+				{
+					Sources = result
+				};
+			}
+			catch (System.Exception exception)
+			{
+				_logger.LogError(exception, "An error occured while processing your request.");
+				return new StatusCodeResult(500);
+			}
+		}
+
 		[HttpGet("")]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchResultDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(StatusCodes.Status501NotImplemented)]
 		public async Task<ActionResult<SearchResultDto>> GetAsync([FromQuery]SearchRequestModel requestModel)
 		{
-			_logger.LogInformation("Inside Search Controller");
 			try
 			{
 				var result = await _searchService.PerformSearchAsync(requestModel);
