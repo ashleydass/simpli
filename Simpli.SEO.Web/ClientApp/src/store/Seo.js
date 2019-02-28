@@ -14,6 +14,14 @@ const fetchSearchSources = async () => {
 }
 
 export const actionCreators = {
+  requestSearchSources: () => async (dispatch, getState) => {
+    const searchSources = await fetchSearchSources()
+
+    dispatch({
+      type: ACTION_TYPE_RECEIVED_SEARCH_SOURCES,
+      searchSources
+    })
+  },
   requestSeo: request => async (dispatch, getState) => {
     dispatch({
       type: ACTION_TYPE_REQUEST_SEO
