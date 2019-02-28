@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { actionCreators } from '../store/Seo';
 import Tabs from 'react-bootstrap/lib/Tabs'
 import Tab from 'react-bootstrap/lib/Tab'
-import classNames from 'classnames'
 
 class Dashboard extends Component {
   constructor(props) {
@@ -14,7 +13,8 @@ class Dashboard extends Component {
     this.state = {
       query: '',
       searchFor: '',
-      active: ''
+      active: '',
+      loop: false
     }
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -23,6 +23,7 @@ class Dashboard extends Component {
     this.getTabs = this.getTabs.bind(this)
     this.getResultsTable = this.getResultsTable.bind(this)
     this.switchTabs = this.switchTabs.bind(this)
+    this.getForm = this.getForm.bind(this)
   }
 
   componentWillMount() {
@@ -38,8 +39,50 @@ class Dashboard extends Component {
   handleSubmit(e) {
     e.preventDefault()
 
+    const { loop } = this.state
+
+    if (loop) {
+      this.toggleLoop(loop)
+      return
+    }
+
+    if (!this.validate()) {
+      alert("Please fill in both fields.")
+      return
+    }
+
+    this.toggleLoop(loop)
+    this.initiateRequest(!loop)
+  }
+
+  toggleLoop(loop) {
+    this.setState({
+      loop: !loop
+    })
+  }
+
+  initiateRequest(loop) {
     const { requestSeo } = this.props
-    requestSeo(this.state)
+    loop = loop || this.state.loop
+
+    if (!loop) {
+      return
+    }
+
+    const { query, searchFor } = this.state
+
+    requestSeo({
+      query, searchFor
+    })
+
+    setTimeout(() => {
+      this.initiateRequest()
+    }, 5000);
+  }
+
+  validate() {
+    const { query, searchFor } = this.state
+    return query && searchFor
   }
 
   getResultsTable(searchSource) {
@@ -92,6 +135,29 @@ class Dashboard extends Component {
       </Tab>))
   }
 
+  getForm() {
+    const { loop } = this.state
+    return (
+      <form>
+        <div className="form-group">
+          <label htmlFor="query">Query</label>
+          <input type="text" className="form-control" id="query" placeholder="Query"
+                onChange={this.handleChange} />
+        </div>
+        <div className="form-group">
+          <label htmlFor="searchFor">Url Part</label>
+          <input type="text" className="form-control" id="searchFor" placeholder="Url Part"
+                onChange={this.handleChange} />
+        </div>
+        {/* <div className="form-check">
+          <input type="checkbox" className="form-check-input" id="useCache" />
+          <label className="form-check-label" htmlFor="useCache">Use Caching</label>
+        </div> */}
+        <button type="submit" className="btn btn-primary"
+                onClick={this.handleSubmit}>{loop?"Pause":"Start"}</button>
+      </form>)
+  }
+
   switchTabs(key) {
     this.setState({
       active: key
@@ -110,27 +176,10 @@ class Dashboard extends Component {
     console.log(defaultSearchSource);
     return (
       <div>
-        <h1>Dashboard</h1>
+        <h1>SEO Dashboard</h1>
         <Row>
           <Col md={5}>
-            <form>
-              <div className="form-group">
-                <label htmlFor="query">Query</label>
-                <input type="text" className="form-control" id="query" placeholder="Query"
-                       onChange={this.handleChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="searchFor">Url Part</label>
-                <input type="text" className="form-control" id="searchFor" placeholder="Url Part"
-                       onChange={this.handleChange} />
-              </div>
-              {/* <div className="form-check">
-                <input type="checkbox" className="form-check-input" id="useCache" />
-                <label className="form-check-label" htmlFor="useCache">Use Caching</label>
-              </div> */}
-              <button type="submit" className="btn btn-primary"
-                      onClick={this.handleSubmit}>Submit</button>
-            </form>
+            {this.getForm()}
           </Col>
         </Row>
         <Row style={{
